@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendário CRM — Julho 2026 | RecargaPay</title>
+<style>
+:root {
+  --bg-dark:   #0a2540;
+  --bg-light:  #ffffff;
+  --panel-bg:  #f0f2f5;
+  --border:    #e2e8f0;
+  --highlight: #f5a623;
+  --accent:    #1a73e8;
+  --accent-2:  #5ba7f5;
+  --text:      #1e293b;
+  --subtle:    #64748b;
+  --pix:       #0C447C; --pix-bg:   #dbeafe;
+  --bills:     #72243E; --bills-bg: #fce7f3;
+  --raf:       #26215C; --raf-bg:   #ede9fe;
+  --tp:        #085041; --tp-bg:    #d1fae5;
+  --tap:       #c2410c; --tap-bg:   #fff7ed;
+  --cdb:       #065f46; --cdb-bg:   #ccfbf1;
+  --titan:     #3730a3; --titan-bg: #e0e7ff;
+  --ccrp:      #7c3aed; --ccrp-bg:  #f5f3ff;
+  --loans:     #be123c; --loans-bg: #ffe4e6;
+  --sent-bg:   #f1f5f9; --sent:     #94a3b8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; overflow-x: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background: var(--panel-bg); color: var(--text); min-height: 100vh; }
+
+header { background: var(--bg-dark); padding: 24px 32px 20px; display: flex; justify-content: space-between; align-items: flex-end; box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+.header-left h1 { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+.header-left p { font-size: 12px; color: var(--accent-2); margin-top: 3px; }
+.brand-dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+
+.filters-bar { background: var(--bg-light); padding: 12px 32px; border-bottom: 1px solid var(--border); display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+.filter-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--highlight); }
+.filter-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+.filter-group { display: flex; flex-direction: column; gap: 5px; }
+.pill { font-size: 10px; font-weight: 500; padding: 4px 10px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--bg-light); color: var(--subtle); cursor: pointer; transition: all 0.15s; user-select: none; }
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+.pill.active { background: var(--bg-dark); color: #fff; border-color: var(--bg-dark); }
+.pill.active.pix    { background: var(--pix);   border-color: var(--pix); }
+.pill.active.bills  { background: var(--bills); border-color: var(--bills); }
+.pill.active.raf    { background: var(--raf);   border-color: var(--raf); }
+.pill.active.tp     { background: var(--tp);    border-color: var(--tp); }
+.pill.active.cdb    { background: var(--cdb);   border-color: var(--cdb); }
+.pill.active.ccrp   { background: var(--ccrp);  border-color: var(--ccrp); }
+.pill.active.loans  { background: var(--loans); border-color: var(--loans); }
+
+.legend-bar { background: var(--bg-light); padding: 6px 32px; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 10px; color: var(--subtle); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+.cal-wrap { padding: 20px 32px 40px; overflow-x: auto; }
+.calendar { display: grid; grid-template-columns: repeat(5, minmax(130px, 1.4fr)) repeat(2, minmax(48px, 0.4fr)); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(0,0,0,.08); background: var(--bg-light); min-width: 840px; }
+
+.dow { background: var(--bg-dark); color: rgba(255,255,255,.7); text-align: center; font-size: 9px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 9px 4px; border-right: 1px solid rgba(255,255,255,.07); }
+.dow:last-child { border-right: none; }
+
+.day-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0; min-height: 130px; display: flex; flex-direction: column; position: relative; transition: box-shadow 0.15s; cursor: pointer; }
+.day-cell:nth-child(7n) { border-right: none; }
+.day-cell:hover { box-shadow: inset 0 0 0 2px var(--accent); z-index: 2; }
+.day-cell.empty { background: #f8fafc; cursor: default; }
+.day-cell.empty:hover { box-shadow: none; }
+.day-cell.weekend { background: #f1f3f6; }
+.day-cell.weekend .day-num { color: #cbd5e1; font-size: 10px; }
+.day-cell.weekend .pills { opacity: 0.85; }
+
+.day-num { font-size: 11px; font-weight: 700; color: #94a3b8; padding: 6px 8px 2px; display: block; }
+.pills { display: flex; flex-direction: column; gap: 3px; padding: 2px 5px 8px; flex: 1; }
+
+.dpill { display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 5px; font-size: 10px; font-weight: 600; line-height: 1.3; transition: transform 0.1s, box-shadow 0.1s; }
+.dpill:hover { transform: scale(1.03); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+.dpill.dimmed { opacity: 0.12; }
+.dpill.pix    { background: var(--pix-bg);    color: var(--pix); }
+.dpill.bills  { background: var(--bills-bg);  color: var(--bills); }
+.dpill.raf    { background: var(--raf-bg);     color: var(--raf); }
+.dpill.tp     { background: var(--tp-bg);      color: var(--tp); }
+.dpill.tap    { background: var(--tap-bg);     color: var(--tap); }
+.dpill.cdb    { background: var(--cdb-bg);     color: var(--cdb); }
+.dpill.ccrp   { background: var(--ccrp-bg);    color: var(--ccrp); }
+.dpill.loans  { background: var(--loans-bg);   color: var(--loans); }
+.dpill.sent   { background: #f1f5f9 !important; color: #94a3b8 !important; opacity: 0.65; }
+.dpill.sent .type-badge { background: #dcfce7 !important; color: #166534 !important; opacity: 1 !important; }
+.dpill .prod  { flex: 1; font-size: 10px; }
+.dpill .type-badge { font-size: 7px; font-weight: 700; padding: 1px 4px; border-radius: 3px; background: rgba(0,0,0,.12); white-space: nowrap; flex-shrink: 0; }
+
+.brasil-section { margin: 2px 5px 5px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 4px 7px; display: flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 600; color: #065f46; line-height: 1.3; }
+.brasil-icon { font-size: 11px; flex-shrink: 0; }
+.brasil-info { flex: 1; }
+.brasil-time { font-size: 8px; color: #059669; font-weight: 500; margin-top: 1px; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,27,61,.6); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 12px; padding: 24px 28px; max-width: 440px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.3); max-height: 80vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.modal-title { font-size: 18px; font-weight: 800; color: var(--bg-dark); letter-spacing: -0.02em; }
+.modal-sub { font-size: 11px; color: var(--subtle); margin-top: 2px; }
+.modal-close { font-size: 18px; color: var(--subtle); cursor: pointer; background: none; border: none; padding: 0; line-height: 1; }
+.modal-close:hover { color: var(--text); }
+.modal-items { display: flex; flex-direction: column; gap: 10px; }
+.modal-item { background: var(--panel-bg); border-radius: 8px; padding: 12px 14px; }
+.modal-item-prod { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.modal-item-mote { font-size: 11px; color: var(--subtle); }
+.modal-item-seg { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+.modal-item-type { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px; margin-top: 6px; }
+.modal-item-type.manual { background: var(--bg-dark); color: #fff; }
+.modal-item-type.auto   { background: var(--border); color: var(--subtle); }
+.modal-item-type.sent   { background: #dcfce7; color: #166534; }
+.modal-empty { font-size: 12px; color: #cbd5e1; font-style: italic; text-align: center; padding: 16px 0; }
+
+/* SUMÁRIO */
+.sumario { margin: 0 32px 40px; background: var(--bg-light); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.sum-header { background: var(--bg-dark); padding: 9px 16px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--highlight); }
+.sum-grid { display: grid; grid-template-columns: repeat(8, 1fr); }
+.sum-item { padding: 12px 14px; border-right: 1px solid var(--border); }
+.sum-item:last-child { border-right: none; }
+.sum-prod { margin-bottom: 6px; font-size: 10px; font-weight: 700; }
+.sum-row { display: flex; justify-content: space-between; margin-top: 3px; }
+.sum-lbl { font-size: 9px; color: var(--subtle); }
+.sum-val { font-size: 11px; font-weight: 700; color: var(--text); }
+.sum-footer { border-top: 1px solid var(--border); background: var(--panel-bg); padding: 9px 16px; display: flex; gap: 2rem; font-size: 11px; color: var(--subtle); flex-wrap: wrap; }
+.sum-footer b { color: var(--text); }
+.confidential { text-align: right; padding: 8px 32px 20px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; color: var(--subtle); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Calendário CRM — Julho 2026</h1>
+    <p>20 disparos · 3 automáticos · 17 manuais</p>
+  </div>
+  <div class="brand-dots">
+    <div class="dot" style="background:#5ba7f5"></div>
+    <div class="dot" style="background:#1a73e8"></div>
+    <div class="dot" style="background:#f5a623"></div>
+    <div class="dot" style="background:#f5c842"></div>
+  </div>
+</header>
+
+<div class="filters-bar">
+  <div class="filter-group">
+    <div class="filter-label">Produto</div>
+    <div class="filter-pills" id="prodFilter">
+      <div class="pill active" data-prod="all">Todos</div>
+      <div class="pill pix"   data-prod="pix">Pix CC</div>
+      <div class="pill bills" data-prod="bills">Bills CC</div>
+      <div class="pill raf"   data-prod="raf">RAF</div>
+      <div class="pill tp"    data-prod="tp">Transport</div>
+      <div class="pill cdb"   data-prod="cdb">CDB</div>
+      <div class="pill ccrp"  data-prod="ccrp">Cartão Garantido</div>
+      <div class="pill loans" data-prod="loans">Loans CLT</div>
+    </div>
+  </div>
+  <div class="filter-group">
+    <div class="filter-label">Status</div>
+    <div class="filter-pills" id="statusFilter">
+      <div class="pill active" data-status="all">Todos</div>
+      <div class="pill" data-status="sent">✓ Enviados</div>
+      <div class="pill" data-status="pending">Pendentes</div>
+    </div>
+  </div>
+</div>
+
+<div class="legend-bar">
+  <span>Legenda:</span>
+  <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border:1px solid #0C447C"></div>Pix CC</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fce7f3;border:1px solid #72243E"></div>Bills CC</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ede9fe;border:1px solid #26215C"></div>RAF</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d1fae5;border:1px solid #085041"></div>Transport</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ccfbf1;border:1px solid #065f46"></div>CDB</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f5f3ff;border:1px solid #7c3aed"></div>Cartão Garantido</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ffe4e6;border:1px solid #be123c"></div>Loans CLT</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f1f5f9;border:1px solid #cbd5e1"></div>✓ Enviado</div>
+  <div class="legend-item"><span style="font-size:9px;background:#0a2540;color:#fff;padding:1px 5px;border-radius:3px;font-weight:700">M</span>Manual</div>
+  <div class="legend-item"><span style="font-size:9px;background:#e2e8f0;color:#475569;padding:1px 5px;border-radius:3px;font-weight:700">A</span>Automático</div>
+</div>
+
+<div class="cal-wrap">
+  <div class="calendar" id="calendar"></div>
+</div>
+
+<div class="sumario">
+  <div class="sum-header">Sumário de Disparos — Julho 2026</div>
+  <div class="sum-grid">
+    <div class="sum-item"><div class="sum-prod" style="color:var(--pix)">Pix CC</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">4</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">4</span></div></div>
+    <div class="sum-item"><div class="sum-prod" style="color:var(--bills)">Bills CC</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">4</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">4</span></div></div>
+    <div class="sum-item"><div class="sum-prod" style="color:var(--raf)">RAF</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">4</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">4</span></div></div>
+    <div class="sum-item"><div class="sum-prod" style="color:var(--cdb)">CDB</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">2</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">2</span></div></div>
+    <div class="sum-item"><div class="sum-prod" style="color:var(--ccrp)">Cartão Garantido</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">1</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">1</span></div></div>
+    <div class="sum-item"><div class="sum-prod" style="color:var(--tap)">Tap to Pay</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">2</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">2</span></div></div><div class="sum-item"><div class="sum-prod" style="color:var(--loans)">Loans CLT</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">2</span></div><div class="sum-row"><span class="sum-lbl">Auto</span><span class="sum-val">2</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">2</span></div></div><div class="sum-item"><div class="sum-prod" style="color:var(--tp)">Transport</div><div class="sum-row"><span class="sum-lbl">Total</span><span class="sum-val">1</span></div><div class="sum-row"><span class="sum-lbl">Enviados</span><span class="sum-val">0</span></div><div class="sum-row"><span class="sum-lbl">Pendentes</span><span class="sum-val">1</span></div></div>
+  </div>
+  <div class="sum-footer">
+    <span><b>Total geral: 20 disparos</b></span>
+    <span>Automático: <b>3</b></span>
+    <span>Manuais: <b>17</b></span>
+    <span>✓ Enviados: <b>0</b></span>
+    <span>Pendentes: <b>20</b></span>
+  </div>
+</div>
+
+<div class="confidential">STRICTLY CONFIDENTIAL</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-sub" id="modalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-items" id="modalItems"></div>
+  </div>
+</div>
+
+<script>
+// Julho 2026: começa quarta (índice 2 em Seg=0)
+const START_DOW = 2;
+const DAYS = 31;
+const DOW = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const MONTH_NAME = 'Julho';
+
+const schedule = {
+  1:  [
+    { prod:'raf', label:'RAF 40/00', mote:'Indique e ganhe R$40', seg:'MAU · Inactive · menos de 1 ano', type:'manual' },
+    { prod:'raf', label:'RAF 60/00', mote:'Prêmio Maior · indique e ganhe R$60', seg:'MAU +1 ano · Inactive · mais de 1 ano', type:'manual' },
+  ],
+  2:  [
+    { prod:'loans', label:'Loans CLT', mote:'Pendente', seg:'Pendente', type:'auto' },
+  ],
+  3:  [
+    { prod:'cdb', label:'CDB', mote:'Salário caiu? Invista no CDB e renda mais', seg:'MAU · Inactive · Never · 5º dia útil', type:'manual' },
+  ],
+  5:  [],
+  6:  [
+    { prod:'tp', label:'Transport', mote:'Recarregue antes de sair', seg:'Inativos em transport 36d–10 anos', type:'auto' },
+  ],
+  7:  [
+    { prod:'tap', label:'Tap to Pay', mote:'7.7 · aproxime e pague', seg:'Pendente', type:'manual' },
+  ],
+  8:  [
+    { prod:'pix', label:'Pix CC', mote:'Pague com o cartão de qualquer banco', seg:'MAU · Inactive · Never', type:'manual' },
+  ],
+  9:  [],
+  10: [
+    { prod:'bills', label:'Bills CC', mote:'Parcele suas contas em até 18x', seg:'MAU · Inactive · Never · saldo até R$1k', type:'manual' },
+  ],
+  13: [
+    { prod:'raf', label:'RAF 40/00', mote:'Indique e ganhe R$40', seg:'MAU · Inactive · menos de 1 ano', type:'manual' },
+    { prod:'raf', label:'RAF 60/00', mote:'Prêmio Maior · indique e ganhe R$60', seg:'MAU +1 ano · Inactive · mais de 1 ano', type:'manual' },
+  ],
+  14: [],
+  15: [
+    { prod:'bills', label:'Bills CC', mote:'Contas e boletos em até 18x', seg:'MAU · Inactive · Never · saldo até R$1k', type:'manual' },
+  ],
+  16: [
+    { prod:'loans', label:'Loans CLT', mote:'Pendente', seg:'Pendente', type:'auto' },
+  ],
+  17: [
+    { prod:'pix', label:'Pix CC', mote:'Pague com o cartão de qualquer banco', seg:'MAU · Inactive · Never', type:'manual' },
+  ],
+  20: [
+    { prod:'pix', label:'Pix CC', mote:'Dia do Amigo · pague com o cartão de qualquer banco', seg:'MAU · Inactive · Never', type:'manual' },
+  ],
+  21: [
+    { prod:'ccrp', label:'Cartão Garantido', mote:'Invista e ganhe limite no cartão', seg:'MAU · Inactive · Never', type:'manual' },
+  ],
+  22: [],
+  23: [
+    { prod:'tap', label:'Tap to Pay', mote:'Pendente', seg:'Pendente', type:'manual' },
+  ],
+  24: [
+    { prod:'bills', label:'Bills CC', mote:'Ainda tem conta pra pagar?', seg:'MAU · Inactive · Never · saldo até R$1k', type:'manual' },
+  ],
+  27: [
+    { prod:'pix', label:'Pix CC', mote:'Pague tudo com o cartão de qualquer banco', seg:'MAU · Inactive · Never', type:'manual' },
+  ],
+  28: [],
+  29: [
+    { prod:'bills', label:'Bills CC', mote:'Fechamento de mês · parcele suas contas', seg:'MAU · Inactive · Never · saldo até R$1k', type:'manual' },
+  ],
+  30: [],
+  31: [
+    { prod:'cdb', label:'CDB', mote:'Último dia útil · invista seu salário no CDB', seg:'MAU · Inactive · Never · quem recebe último dia útil', type:'manual' },
+  ],
+};
+
+function buildCalendar() {
+  const cal = document.getElementById('calendar');
+  DOW.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'dow';
+    el.textContent = d;
+    cal.appendChild(el);
+  });
+
+  for (let i = 0; i < START_DOW; i++) {
+    const el = document.createElement('div');
+    el.className = 'day-cell empty';
+    cal.appendChild(el);
+  }
+
+  for (let day = 1; day <= DAYS; day++) {
+    const dowIdx = (START_DOW + day - 1) % 7;
+    const isWeekend = dowIdx === 5 || dowIdx === 6;
+    const items = schedule[day] || [];
+
+    const cell = document.createElement('div');
+    cell.className = `day-cell${isWeekend ? ' weekend' : ''}`;
+    cell.dataset.day = day;
+
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = day;
+    cell.appendChild(numEl);
+
+    const pillsEl = document.createElement('div');
+    pillsEl.className = 'pills';
+
+    const brasilItem = items.find(i => i.brasil);
+
+    items.forEach(item => {
+      const pill = document.createElement('div');
+      pill.className = `dpill ${item.prod} ${item.type === 'sent' ? 'sent' : ''}`;
+      pill.dataset.prod = item.prod;
+      pill.dataset.status = item.type === 'sent' ? 'sent' : 'pending';
+
+      const prodEl = document.createElement('span');
+      prodEl.className = 'prod';
+      prodEl.textContent = item.label;
+
+      const badge = document.createElement('span');
+      badge.className = 'type-badge';
+      badge.textContent = item.type === 'sent' ? '✓' : item.type === 'auto' ? 'A' : 'M';
+
+      pill.appendChild(prodEl);
+      pill.appendChild(badge);
+      pillsEl.appendChild(pill);
+    });
+
+    cell.appendChild(pillsEl);
+
+    if (brasilItem) {
+      const brasilEl = document.createElement('div');
+      brasilEl.className = 'brasil-section';
+      const parts = brasilItem.brasil.split(' · ');
+      brasilEl.innerHTML = `<span class="brasil-icon">🇧🇷</span><div class="brasil-info"><div>${parts[0]}</div><div class="brasil-time">${parts.slice(1).join(' · ')}</div></div>`;
+      cell.appendChild(brasilEl);
+    }
+
+    cell.addEventListener('click', () => openModal(day, items, dowIdx));
+    cal.appendChild(cell);
+  }
+
+  const total = START_DOW + DAYS;
+  const remainder = (7 - (total % 7)) % 7;
+  for (let i = 0; i < remainder; i++) {
+    const el = document.createElement('div');
+    el.className = 'day-cell empty';
+    cal.appendChild(el);
+  }
+}
+
+function openModal(day, items, dowIdx) {
+  document.getElementById('modalTitle').textContent = `${DOW[dowIdx]}, ${day} de ${MONTH_NAME} 2026`;
+  document.getElementById('modalSub').textContent = items.length
+    ? `${items.length} disparo${items.length > 1 ? 's' : ''} programado${items.length > 1 ? 's' : ''}`
+    : 'Sem disparos';
+
+  const container = document.getElementById('modalItems');
+  container.innerHTML = '';
+
+  if (!items.length) {
+    container.innerHTML = '<div class="modal-empty">Nenhum disparo neste dia.</div>';
+  } else {
+    items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'modal-item';
+      el.innerHTML = `
+        <div class="modal-item-prod">${item.label}</div>
+        <div class="modal-item-mote">${item.mote}</div>
+        ${item.seg ? `<div class="modal-item-seg">${item.seg}</div>` : ''}
+        ${item.brasil ? `<div style="margin-top:5px;font-size:10px;font-weight:700;color:#065f46">🇧🇷 ${item.brasil}</div>` : ''}
+        <span class="modal-item-type ${item.type}">${item.type === 'sent' ? '✓ Enviado' : item.type === 'auto' ? 'Automático' : 'Manual'}</span>
+      `;
+      container.appendChild(el);
+    });
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+let activeProd = 'all', activeStatus = 'all';
+function applyFilters() {
+  document.querySelectorAll('.dpill').forEach(pill => {
+    const prodMatch = activeProd === 'all' || pill.dataset.prod === activeProd;
+    const statusMatch = activeStatus === 'all' || pill.dataset.status === activeStatus;
+    pill.classList.toggle('dimmed', !(prodMatch && statusMatch));
+  });
+}
+
+document.getElementById('prodFilter').addEventListener('click', e => {
+  const p = e.target.closest('.pill'); if (!p) return;
+  document.querySelectorAll('#prodFilter .pill').forEach(x => x.classList.remove('active'));
+  p.classList.add('active'); activeProd = p.dataset.prod; applyFilters();
+});
+document.getElementById('statusFilter').addEventListener('click', e => {
+  const p = e.target.closest('.pill'); if (!p) return;
+  document.querySelectorAll('#statusFilter .pill').forEach(x => x.classList.remove('active'));
+  p.classList.add('active'); activeStatus = p.dataset.status; applyFilters();
+});
+
+buildCalendar();
+</script>
+</body>
+</html>
